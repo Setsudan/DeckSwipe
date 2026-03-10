@@ -2,7 +2,7 @@
 
 A privacy-first, offline flashcard app that gamifies study sessions using familiar dating-app swipe mechanics. 
 
-![Version](https://img.shields.io/badge/Version-0.0.1-blue?style=flat-square)
+![Version](https://img.shields.io/badge/Version-0.1.0-blue?style=flat-square)
 ![Status](https://img.shields.io/badge/Status-Concept-yellow?style=flat-square)
 ![License](https://img.shields.io/badge/License-GPLv3-red?style=flat-square)
 ![Privacy](https://img.shields.io/badge/Tracking-0%25-success?style=flat-square)
@@ -67,3 +67,20 @@ For developers or power users, DeckSwipe expects the following JSON structure wh
     }
   ]
 }
+
+```
+
+## Roadmap
+
+**Planned for April 2026**
+
+* [ ] Jetpack Compose Swipe Physics (Tinder card stack)
+* [ ] Room Database Schema for Decks & Cards
+* [ ] Basic Spaced Repetition Algorithm
+* [ ] BYOAI Clipboard Prompt Generator & JSON Parser
+* [ ] Dark/Light Mode Theming
+
+## License
+
+**GPLv3** - See [LICENSE](https://www.google.com/search?q=LICENSE).
+Free to use, study, and modify.
