@@ -13,7 +13,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -128,17 +127,11 @@ fun StudyScreen(
                             )
                         }
                         Spacer(modifier = Modifier.height(24.dp))
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Button(onClick = { vm.onForgot(); showBack = false }) {
-                                Text(text = "Forgot (swipe left)")
-                            }
-                            Button(onClick = { vm.onKnewIt(); showBack = false }) {
-                                Text(text = "Knew it (swipe right)")
-                            }
-                        }
+                        Text(
+                            text = "Swipe left if you forgot, swipe right if you knew it.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            textAlign = TextAlign.Center
+                        )
                     }
                 }
             }

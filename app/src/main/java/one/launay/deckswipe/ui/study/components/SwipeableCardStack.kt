@@ -7,6 +7,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -18,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.coroutineScope
@@ -36,6 +39,18 @@ fun SwipeableCardStack(
 
     val rotation = offsetX.value / 30f
     val swipeThreshold = 160f
+    val swipeFraction = (offsetX.value / swipeThreshold).coerceIn(-1f, 1f)
+
+    val leftColor: Color = if (swipeFraction < 0f) {
+        MaterialTheme.colorScheme.error.copy(alpha = -swipeFraction * 0.4f)
+    } else {
+        Color.Transparent
+    }
+    val rightColor: Color = if (swipeFraction > 0f) {
+        MaterialTheme.colorScheme.primary.copy(alpha = swipeFraction * 0.4f)
+    } else {
+        Color.Transparent
+    }
 
     Box(
         modifier = modifier
@@ -92,6 +107,23 @@ fun SwipeableCardStack(
                 }
             }
     ) {
+        Row(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+                    .background(leftColor)
+            )
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+                    .background(rightColor)
+            )
+        }
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
