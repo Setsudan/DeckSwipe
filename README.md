@@ -3,7 +3,7 @@
 A privacy-first, offline flashcard app that gamifies study sessions using familiar dating-app swipe mechanics. 
 
 ![Version](https://img.shields.io/badge/Version-0.1.0-blue?style=flat-square)
-![Status](https://img.shields.io/badge/Status-Concept-yellow?style=flat-square)
+![Status](https://img.shields.io/badge/Status-Prototype-green?style=flat-square)
 ![License](https://img.shields.io/badge/License-GPLv3-red?style=flat-square)
 ![Privacy](https://img.shields.io/badge/Tracking-0%25-success?style=flat-square)
 
@@ -70,15 +70,22 @@ For developers or power users, DeckSwipe expects the following JSON structure wh
 
 ```
 
-## Roadmap
+## Current Implementation
 
-**Planned for April 2026**
+The current prototype includes:
 
-* [ ] Jetpack Compose Swipe Physics (Tinder card stack)
-* [ ] Room Database Schema for Decks & Cards
-* [ ] Basic Spaced Repetition Algorithm
-* [ ] BYOAI Clipboard Prompt Generator & JSON Parser
-* [ ] Dark/Light Mode Theming
+* Jetpack Compose swipeable card stack for studying decks.
+* Room database schema for decks and cards, with a simple spaced repetition model.
+* Clipboard-based JSON import matching the schema described above.
+* Dark and light themes using Material 3.
+
+To run the app, open this project in Android Studio (Giraffe or newer) and run the `app` configuration on an emulator or device running Android 15 (API 36) or newer.
+
+To run unit tests:
+
+```bash
+./gradlew test
+```
 
 ## License
 
