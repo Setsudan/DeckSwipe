@@ -5,6 +5,7 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import one.launay.deckswipe.ui.settings.AppColorScheme
 
 private val DarkColors = darkColorScheme(
     primary = GreenCorrect,
@@ -24,17 +25,21 @@ private val LightColors = lightColorScheme(
     onSecondary = Color.White,
     background = DeckBackgroundLight,
     surface = Color.White,
-    onBackground = Color.Black,
-    onSurface = Color.Black
+    onBackground = Color(0xFF1D1B33),
+    onSurface = Color(0xFF1D1B33)
 )
 
 @Composable
 fun DeckSwipeTheme(
-    darkTheme: Boolean = false,
+    colorScheme: AppColorScheme,
     content: @Composable () -> Unit
 ) {
+    val scheme = when (colorScheme) {
+        AppColorScheme.LIGHT -> LightColors
+        AppColorScheme.DARK -> DarkColors
+    }
     MaterialTheme(
-        colorScheme = if (darkTheme) DarkColors else LightColors,
+        colorScheme = scheme,
         content = content
     )
 }

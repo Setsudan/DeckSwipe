@@ -1,15 +1,16 @@
 package one.launay.deckswipe.ui.decks
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -17,12 +18,14 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
@@ -31,6 +34,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import one.launay.deckswipe.ui.LocalDeckRepository
+import one.launay.deckswipe.ui.theme.GradientEnd
+import one.launay.deckswipe.ui.theme.GradientStart
 
 @Composable
 fun DeckListScreen(
@@ -61,32 +66,25 @@ fun DeckListScreen(
         }
     }
 
+    val gradient = Brush.verticalGradient(colors = listOf(GradientStart, GradientEnd))
+
     Scaffold { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .background(gradient)
                 .padding(paddingValues)
                 .padding(16.dp)
         ) {
-            Text(text = "Your decks")
+            Text(
+                text = "Your decks",
+                style = MaterialTheme.typography.headlineSmall
+            )
             Spacer(modifier = Modifier.padding(top = 8.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
+            OutlinedButton(
+                onClick = onNewDeck
             ) {
-                Button(
-                    modifier = Modifier.weight(1f),
-                    onClick = onNewDeck
-                ) {
-                    Text(text = "New deck")
-                }
-                OutlinedButton(
-                    modifier = Modifier.weight(1f),
-                    onClick = onImportClick
-                ) {
-                    Text(text = "Import from AI")
-                }
+                Text(text = "Create deck")
             }
             Spacer(modifier = Modifier.padding(top = 16.dp))
 
@@ -134,7 +132,8 @@ fun DeckListScreen(
                                         .fillMaxWidth()
                                         .padding(vertical = 4.dp)
                                         .clickable { onStudyDeck(deck.id) },
-                                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                                    shape = RoundedCornerShape(20.dp)
                                 ) {
                                     Column(
                                         modifier = Modifier.padding(16.dp)
