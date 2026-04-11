@@ -45,7 +45,10 @@ class ClipboardImporter(
             name = dto.deckName.trim(),
             topicTags = dto.topicTags.map { it.trim() }.filter { it.isNotEmpty() },
             createdAtMillis = now,
-            updatedAtMillis = now
+            updatedAtMillis = now,
+            isFavorite = false,
+            description = "",
+            coverUri = null
         )
 
         val cards = dto.cards.mapIndexed { index, cardDto ->

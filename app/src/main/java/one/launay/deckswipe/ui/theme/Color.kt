@@ -2,15 +2,10 @@ package one.launay.deckswipe.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val GreenCorrect = Color(0xFF1EB980)
-val RedForgot = Color(0xFFE53935)
-val DeckBackgroundDark = Color(0xFF121212)
-val DeckBackgroundLight = Color(0xFFF2F0FF)
-
-val GradientStart = Color(0xFFFFE5EC)
-val GradientEnd = Color(0xFFE3ECFF)
-
-val CardPink = Color(0xFFFFC4D6)
-val CardBlue = Color(0xFFCADBFF)
-val CardNeutral = Color(0xFFFFFFFF)
-
+val White = Color(0xFFFFFFFF)
+val NearBlack = Color(0xFF121212)
+val ClayLight = Color(0xFFE8E4DF)
+val Clay = Color(0xFFC9C2BA)
+val ClayDark = Color(0xFF8A847C)
+val ClaySurfaceLight = Color(0xFFF3F0EC)
+val ClaySurfaceDark = Color(0xFF1E1C1A)

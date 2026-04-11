@@ -44,6 +44,13 @@ android {
     }
 }
 
+kapt {
+    arguments {
+        arg("room.schemaLocation", "$projectDir/schemas")
+        arg("room.incremental", "true")
+    }
+}
+
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
@@ -58,6 +65,9 @@ dependencies {
     implementation(libs.lifecycle.runtime.ktx)
     implementation(libs.lifecycle.viewmodel.compose)
 
+    implementation(libs.coil.compose)
+    implementation("androidx.compose.material:material-icons-extended")
+
     implementation(libs.coroutines.core)
     implementation(libs.serialization.json)
 
@@ -66,6 +76,8 @@ dependencies {
     kapt(libs.room.compiler)
 
     testImplementation(libs.junit)
+    testImplementation(libs.coroutines.test)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.room.testing)
 }

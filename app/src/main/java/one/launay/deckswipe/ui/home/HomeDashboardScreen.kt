@@ -24,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import one.launay.deckswipe.ui.theme.LargeCardCornerShape
 import one.launay.deckswipe.domain.model.Deck
 import one.launay.deckswipe.ui.LocalDeckRepository
 import one.launay.deckswipe.ui.LocalStrings
@@ -40,7 +41,7 @@ data class HomeDashboardState(
 @Composable
 fun HomeDashboardScreen(
     onBrowseDecks: () -> Unit,
-    onStudyDeck: (Long) -> Unit
+    onOpenDeckDetails: (Long) -> Unit
 ) {
     val repository = LocalDeckRepository.current
     val strings = LocalStrings.current
@@ -75,7 +76,7 @@ fun HomeDashboardScreen(
         } catch (_: Throwable) {
             state = HomeDashboardState(
                 isLoading = false,
-                errorMessage = "Failed to load home data."
+                errorMessage = strings.homeLoadError
             )
         }
     }
@@ -108,7 +109,6 @@ fun HomeDashboardScreen(
             return@Column
         }
 
-        // Recent deck
         Text(
             text = strings.homeRecentDeckTitle,
             style = MaterialTheme.typography.titleMedium
@@ -119,10 +119,12 @@ fun HomeDashboardScreen(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { onStudyDeck(recentDeck.id) },
+                    .clickable { onOpenDeckDetails(recentDeck.id) },
+                shape = LargeCardCornerShape,
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surface
-                )
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp),
@@ -149,7 +151,6 @@ fun HomeDashboardScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Statistics
         Text(
             text = strings.homeStatsTitle,
             style = MaterialTheme.typography.titleMedium
@@ -157,9 +158,11 @@ fun HomeDashboardScreen(
         Spacer(modifier = Modifier.height(8.dp))
         Card(
             modifier = Modifier.fillMaxWidth(),
+            shape = LargeCardCornerShape,
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surface
-            )
+            ),
+            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
         ) {
             Column(
                 modifier = Modifier.padding(16.dp),
@@ -196,7 +199,6 @@ fun HomeDashboardScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Suggestions
         Text(
             text = strings.homeSuggestionsTitle,
             style = MaterialTheme.typography.titleMedium
@@ -216,10 +218,12 @@ fun HomeDashboardScreen(
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable { onStudyDeck(deck.id) },
+                            .clickable { onOpenDeckDetails(deck.id) },
+                        shape = LargeCardCornerShape,
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.surface
-                        )
+                        ),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                     ) {
                         Column(
                             modifier = Modifier.padding(16.dp),
@@ -241,10 +245,9 @@ fun HomeDashboardScreen(
 
         Text(
             modifier = Modifier.clickable { onBrowseDecks() },
-            text = strings.navBrowse,
+            text = strings.homeBrowseDecksLink,
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.primary
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }
-

@@ -12,8 +12,8 @@ import one.launay.deckswipe.data.entity.DeckEntity
         DeckEntity::class,
         CardEntity::class
     ],
-    version = 1,
-    exportSchema = false
+    version = 2,
+    exportSchema = true
 )
 abstract class DeckSwipeDatabase : RoomDatabase() {
 
@@ -29,11 +29,12 @@ abstract class DeckSwipeDatabase : RoomDatabase() {
                     context.applicationContext,
                     DeckSwipeDatabase::class.java,
                     "deckswipe.db"
-                ).build().also { db ->
-                    instance = db
-                }
+                )
+                    .addMigrations(MIGRATION_1_2)
+                    .build().also { db ->
+                        instance = db
+                    }
             }
         }
     }
 }
-

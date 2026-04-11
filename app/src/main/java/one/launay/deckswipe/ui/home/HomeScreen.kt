@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -16,11 +15,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import one.launay.deckswipe.ui.LocalStrings
-import one.launay.deckswipe.ui.theme.CardBlue
-import one.launay.deckswipe.ui.theme.CardPink
+import one.launay.deckswipe.ui.theme.LargeCardCornerShape
 
 @Composable
 fun CreateDeckScreen(
@@ -46,7 +43,7 @@ fun CreateDeckScreen(
             title = strings.homeAiGeneratedTitle,
             description = strings.homeAiGeneratedDescription,
             buttonText = strings.homeAiGeneratedButton,
-            containerColor = CardPink,
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
             onClick = onAiDeck
         )
 
@@ -56,7 +53,7 @@ fun CreateDeckScreen(
             title = strings.homeManualTitle,
             description = strings.homeManualDescription,
             buttonText = strings.homeManualButton,
-            containerColor = CardBlue,
+            containerColor = MaterialTheme.colorScheme.surface,
             onClick = onManualDeck
         )
     }
@@ -71,13 +68,12 @@ private fun HomeOptionCard(
     onClick: () -> Unit
 ) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(24.dp)),
+        modifier = Modifier.fillMaxWidth(),
+        shape = LargeCardCornerShape,
         colors = CardDefaults.cardColors(
             containerColor = containerColor
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
             modifier = Modifier
@@ -98,7 +94,7 @@ private fun HomeOptionCard(
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = onClick,
-                shape = RoundedCornerShape(50)
+                shape = MaterialTheme.shapes.medium
             ) {
                 Text(text = buttonText)
             }

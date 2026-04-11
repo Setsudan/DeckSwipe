@@ -8,10 +8,17 @@ import kotlinx.coroutines.launch
 import one.launay.deckswipe.domain.model.Deck
 import one.launay.deckswipe.domain.repository.DeckRepository
 
+data class DeckListRow(
+    val deck: Deck,
+    val totalCards: Int,
+    val dueNowCount: Int,
+    val masteryProgress: Float
+)
+
 sealed class DeckListUiState {
     object Loading : DeckListUiState()
-    data class Loaded(val decks: List<Deck>) : DeckListUiState()
-    data class Error(val message: String) : DeckListUiState()
+    data class Loaded(val rows: List<DeckListRow>) : DeckListUiState()
+    object Error : DeckListUiState()
 }
 
 class DeckListViewModel(
@@ -30,11 +37,45 @@ class DeckListViewModel(
             _state.value = DeckListUiState.Loading
             try {
                 val decks = repository.getDecks()
-                _state.value = DeckListUiState.Loaded(decks)
+                val now = System.currentTimeMillis()
+                val rows = decks.map { deck ->
+                    val total = repository.getCardCountForDeck(deck.id)
+                    val due = repository.getDueCardsForDeck(deck.id, now).size
+                    val mastered = (total - due).coerceAtLeast(0)
+                    val mastery = if (total == 0) {
+                        0f
+                    } else {
+                        mastered.toFloat() / total.toFloat()
+                    }
+                    DeckListRow(
+                        deck = deck,
+                        totalCards = total,
+                        dueNowCount = due,
+                        masteryProgress = mastery
+                    )
+                }
+                _state.value = DeckListUiState.Loaded(rows)
             } catch (_: Throwable) {
-                _state.value = DeckListUiState.Error("Failed to load decks.")
+                _state.value = DeckListUiState.Error
             }
         }
     }
-}
 
+    fun toggleFavorite(deckId: Long) {
+        val loaded = _state.value as? DeckListUiState.Loaded ?: return
+        val row = loaded.rows.find { it.deck.id == deckId } ?: return
+        val deck = row.deck
+        viewModelScope.launch {
+            repository.updateDeck(deck.copy(isFavorite = !deck.isFavorite))
+            _state.value = DeckListUiState.Loaded(
+                loaded.rows.map { r ->
+                    if (r.deck.id == deckId) {
+                        r.copy(deck = deck.copy(isFavorite = !deck.isFavorite))
+                    } else {
+                        r
+                    }
+                }
+            )
+        }
+    }
+}

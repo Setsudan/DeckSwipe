@@ -11,14 +11,17 @@ The app is offline-only. There are no network calls and no internet permission i
 ### Key Entry Points
 
 - `MainActivity` – hosts Compose and calls `DeckSwipeApp()`.
-- `DeckSwipeApp` – sets up Room, repository, clipboard importer, and navigation graph.
-- `DeckSwipeNavHost` – defines navigation between deck list, import, and study screens.
+- `DeckSwipeApplication` – creates singleton `DeckSwipeDatabase`, `DeckRepositoryImpl`, and `ClipboardImporter` in `onCreate()`.
+- `DeckSwipeApp` – provides repository and importer via `CompositionLocal`, applies theme, bottom navigation, and hosts `DeckSwipeNavHost`.
+- `DeckSwipeNavHost` – defines navigation between home, deck list, deck details (`deck/{deckId}`), create/import, study, and settings.
 
 ### Persistence
 
 - `DeckEntity` and `CardEntity` define the Room schema.
-- `DeckSwipeDao` provides queries, including `getDueCardsForDeck`.
+- Database version **2** adds `is_favorite`, `description`, and `cover_uri` on `decks` via `MIGRATION_1_2` in `DeckSwipeMigrations.kt`.
+- `DeckSwipeDao` provides queries, including `getDueCardsForDeck`, `getDeckById`, and `countCardsForDeck`.
 - `DeckRepositoryImpl` maps between Room entities and domain models.
+- Room exports JSON schemas under `app/schemas/` (see `room.schemaLocation` in `app/build.gradle.kts`) for migration review.
 
 ### Spaced Repetition
 
@@ -29,10 +32,10 @@ The app is offline-only. There are no network calls and no internet permission i
 
 - JSON schema is documented in `README.md`.
 - `ClipboardImporter` parses clipboard JSON into domain `Deck` and `Card` objects.
-- `ImportViewModel` wires `ClipboardManager` to `ClipboardImporter` and the repository.
+- `ImportViewModel` uses `ClipboardAccessor` (see `ClipboardAccessor.kt`) so tests can fake clipboard outcomes without Android framework classes.
 
 ### Testing
 
-- Unit tests for spaced repetition and clipboard import live under `app/src/test/java/one/launay/deckswipe`.
-- Run with `./gradlew test`.
-
+- Unit tests for spaced repetition, clipboard import, and ViewModels live under `app/src/test/java/one/launay/deckswipe`.
+- Android instrumented tests: `DeckSwipeDatabaseInstrumentedTest`, `DeckSwipeMigrationTest` (1 to 2 migration).
+- Run unit tests with `./gradlew test`.

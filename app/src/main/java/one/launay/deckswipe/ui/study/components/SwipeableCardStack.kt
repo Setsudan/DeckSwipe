@@ -12,7 +12,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
+import one.launay.deckswipe.ui.theme.LargeCardCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -42,12 +42,12 @@ fun SwipeableCardStack(
     val swipeFraction = (offsetX.value / swipeThreshold).coerceIn(-1f, 1f)
 
     val leftColor: Color = if (swipeFraction < 0f) {
-        MaterialTheme.colorScheme.error.copy(alpha = -swipeFraction * 0.4f)
+        MaterialTheme.colorScheme.onSurface.copy(alpha = -swipeFraction * 0.18f)
     } else {
         Color.Transparent
     }
     val rightColor: Color = if (swipeFraction > 0f) {
-        MaterialTheme.colorScheme.primary.copy(alpha = swipeFraction * 0.4f)
+        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = swipeFraction * 0.55f)
     } else {
         Color.Transparent
     }
@@ -137,7 +137,7 @@ fun SwipeableCardStack(
                 .rotate(rotation)
                 .background(
                     color = MaterialTheme.colorScheme.surface,
-                    shape = RoundedCornerShape(24.dp)
+                    shape = LargeCardCornerShape
                 )
         ) {
             content()

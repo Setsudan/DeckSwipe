@@ -14,6 +14,12 @@ interface DeckSwipeDao {
     @Query("SELECT * FROM decks ORDER BY updated_at DESC")
     suspend fun getDecks(): List<DeckEntity>
 
+    @Query("SELECT * FROM decks WHERE id = :deckId LIMIT 1")
+    suspend fun getDeckById(deckId: Long): DeckEntity?
+
+    @Query("SELECT COUNT(*) FROM cards WHERE deck_id = :deckId")
+    suspend fun countCardsForDeck(deckId: Long): Int
+
     @Query(
         "SELECT * FROM cards " +
             "WHERE deck_id = :deckId AND due_at <= :nowMillis " +
@@ -54,4 +60,3 @@ interface DeckSwipeDao {
     @Query("DELETE FROM decks WHERE id = :deckId")
     suspend fun deleteDeckById(deckId: Long)
 }
-

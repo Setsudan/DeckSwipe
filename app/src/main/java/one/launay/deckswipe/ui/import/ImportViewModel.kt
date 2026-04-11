@@ -1,8 +1,5 @@
 package one.launay.deckswipe.ui.import
 
-import android.content.ClipDescription
-import android.content.ClipboardManager
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,17 +9,25 @@ import one.launay.deckswipe.data.clipboard.ClipboardImporter
 import one.launay.deckswipe.data.clipboard.ImportResult
 import one.launay.deckswipe.domain.repository.DeckRepository
 
+sealed class ImportFailure {
+    object ClipboardEmpty : ImportFailure()
+    object ClipboardNotText : ImportFailure()
+    object TextEmpty : ImportFailure()
+    object InvalidJson : ImportFailure()
+    object MissingFields : ImportFailure()
+}
+
 sealed class ImportUiState {
     object Idle : ImportUiState()
     object Importing : ImportUiState()
     data class Success(val deckId: Long) : ImportUiState()
-    data class Error(val message: String) : ImportUiState()
+    data class Error(val failure: ImportFailure) : ImportUiState()
 }
 
 class ImportViewModel(
-    private val context: Context,
     private val clipboardImporter: ClipboardImporter,
-    private val repository: DeckRepository
+    private val repository: DeckRepository,
+    private val clipboardAccessor: ClipboardAccessor
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<ImportUiState>(ImportUiState.Idle)
@@ -31,38 +36,31 @@ class ImportViewModel(
     fun importFromClipboard() {
         viewModelScope.launch {
             _state.value = ImportUiState.Importing
-            val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-            val clip = clipboard.primaryClip
-
-            if (clip == null || !clipboard.hasPrimaryClip()) {
-                _state.value = ImportUiState.Error("Clipboard is empty.")
-                return@launch
-            }
-
-            val description: ClipDescription = clip.description
-            if (!description.hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN) &&
-                !description.hasMimeType(ClipDescription.MIMETYPE_TEXT_HTML)
-            ) {
-                _state.value = ImportUiState.Error("Clipboard does not contain text.")
-                return@launch
-            }
-
-            val item = clip.getItemAt(0)
-            val text = item.text?.toString()
-
-            when (val result = clipboardImporter.importFromJson(text)) {
-                is ImportResult.Error.EmptyInput -> {
-                    _state.value = ImportUiState.Error("Clipboard text is empty.")
+            when (val outcome = clipboardAccessor.read()) {
+                is ClipboardReadOutcome.EmptyClipboard -> {
+                    _state.value = ImportUiState.Error(ImportFailure.ClipboardEmpty)
+                    return@launch
                 }
-                is ImportResult.Error.InvalidJson -> {
-                    _state.value = ImportUiState.Error("Clipboard text is not valid JSON.")
+                is ClipboardReadOutcome.UnsupportedMime -> {
+                    _state.value = ImportUiState.Error(ImportFailure.ClipboardNotText)
+                    return@launch
                 }
-                is ImportResult.Error.MissingRequiredFields -> {
-                    _state.value = ImportUiState.Error("JSON is missing required fields.")
-                }
-                is ImportResult.Success -> {
-                    val deckId = repository.insertDeckWithCards(result.deck, result.cards)
-                    _state.value = ImportUiState.Success(deckId = deckId)
+                is ClipboardReadOutcome.Ok -> {
+                    when (val result = clipboardImporter.importFromJson(outcome.text)) {
+                        is ImportResult.Error.EmptyInput -> {
+                            _state.value = ImportUiState.Error(ImportFailure.TextEmpty)
+                        }
+                        is ImportResult.Error.InvalidJson -> {
+                            _state.value = ImportUiState.Error(ImportFailure.InvalidJson)
+                        }
+                        is ImportResult.Error.MissingRequiredFields -> {
+                            _state.value = ImportUiState.Error(ImportFailure.MissingFields)
+                        }
+                        is ImportResult.Success -> {
+                            val deckId = repository.insertDeckWithCards(result.deck, result.cards)
+                            _state.value = ImportUiState.Success(deckId = deckId)
+                        }
+                    }
                 }
             }
         }
@@ -72,4 +70,3 @@ class ImportViewModel(
         _state.value = ImportUiState.Idle
     }
 }
-

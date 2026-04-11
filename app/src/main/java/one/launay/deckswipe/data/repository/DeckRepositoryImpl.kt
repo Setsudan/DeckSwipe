@@ -12,10 +12,18 @@ import one.launay.deckswipe.domain.repository.DeckRepository
 class DeckRepositoryImpl(
     private val dao: DeckSwipeDao,
     private val clock: () -> Long
-): DeckRepository {
+) : DeckRepository {
 
     override suspend fun getDecks(): List<Deck> = withContext(Dispatchers.IO) {
         dao.getDecks().map { it.toDomain() }
+    }
+
+    override suspend fun getDeck(deckId: Long): Deck? = withContext(Dispatchers.IO) {
+        dao.getDeckById(deckId)?.toDomain()
+    }
+
+    override suspend fun getCardCountForDeck(deckId: Long): Int = withContext(Dispatchers.IO) {
+        dao.countCardsForDeck(deckId)
     }
 
     override suspend fun getDueCardsForDeck(deckId: Long, nowMillis: Long): List<Card> =
@@ -35,6 +43,13 @@ class DeckRepositoryImpl(
             val cardEntities = cards.map { it.toEntity(deckId = deck.id) }
             dao.insertDeckWithCards(deckEntity, cardEntities)
         }
+
+    override suspend fun updateDeck(deck: Deck) {
+        withContext(Dispatchers.IO) {
+            val now = clock()
+            dao.upsertDeck(deck.toEntity(now))
+        }
+    }
 
     override suspend fun upsertCard(card: Card): Long = withContext(Dispatchers.IO) {
         dao.upsertCard(card.toEntity(deckId = card.deckId))
@@ -59,7 +74,10 @@ class DeckRepositoryImpl(
             name = name,
             topicTags = tags,
             createdAtMillis = createdAtMillis,
-            updatedAtMillis = updatedAtMillis
+            updatedAtMillis = updatedAtMillis,
+            isFavorite = isFavorite,
+            description = description,
+            coverUri = coverUri
         )
     }
 
@@ -88,7 +106,10 @@ class DeckRepositoryImpl(
             name = name,
             topicTags = tags,
             createdAtMillis = created,
-            updatedAtMillis = nowMillis
+            updatedAtMillis = nowMillis,
+            isFavorite = isFavorite,
+            description = description,
+            coverUri = coverUri
         )
     }
 
@@ -105,4 +126,3 @@ class DeckRepositoryImpl(
         )
     }
 }
-

@@ -12,8 +12,10 @@ import one.launay.deckswipe.domain.spacedrepetition.SpacedRepetitionEngine
 
 data class StudyUiState(
     val isLoading: Boolean = true,
+    val deckTitle: String = "",
     val currentCard: Card? = null,
-    val remainingCount: Int = 0
+    val remainingCount: Int = 0,
+    val sessionReviewsCompleted: Int = 0
 )
 
 class StudyViewModel(
@@ -35,12 +37,16 @@ class StudyViewModel(
         viewModelScope.launch {
             _state.value = _state.value.copy(isLoading = true)
             val now = System.currentTimeMillis()
+            val decks = repository.getDecks()
+            val title = decks.find { it.id == deckId }?.name?.trim().orEmpty()
             val cards = repository.getDueCardsForDeck(deckId, now)
             queue = cards.toMutableList()
             _state.value = StudyUiState(
                 isLoading = false,
+                deckTitle = title,
                 currentCard = queue.firstOrNull(),
-                remainingCount = queue.size
+                remainingCount = queue.size,
+                sessionReviewsCompleted = 0
             )
         }
     }
@@ -65,11 +71,12 @@ class StudyViewModel(
                 queue.removeAt(0)
             }
             val nextCard = queue.firstOrNull()
-            _state.value = _state.value.copy(
+            val prev = _state.value
+            _state.value = prev.copy(
                 currentCard = nextCard,
-                remainingCount = queue.size
+                remainingCount = queue.size,
+                sessionReviewsCompleted = prev.sessionReviewsCompleted + 1
             )
         }
     }
 }
-

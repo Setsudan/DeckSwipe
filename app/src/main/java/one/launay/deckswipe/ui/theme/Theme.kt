@@ -1,6 +1,7 @@
 package one.launay.deckswipe.ui.theme
 
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Shapes
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
@@ -8,25 +9,59 @@ import androidx.compose.ui.graphics.Color
 import one.launay.deckswipe.ui.settings.AppColorScheme
 
 private val DarkColors = darkColorScheme(
-    primary = GreenCorrect,
-    onPrimary = Color.Black,
-    secondary = RedForgot,
-    onSecondary = Color.White,
-    background = DeckBackgroundDark,
-    surface = Color(0xFF1E1E1E),
-    onBackground = Color.White,
-    onSurface = Color.White
+    primary = Clay,
+    onPrimary = NearBlack,
+    primaryContainer = ClayDark,
+    onPrimaryContainer = White,
+    secondary = ClayDark,
+    onSecondary = White,
+    secondaryContainer = ClaySurfaceDark,
+    onSecondaryContainer = ClayLight,
+    tertiary = ClayLight,
+    onTertiary = NearBlack,
+    background = NearBlack,
+    onBackground = White,
+    surface = ClaySurfaceDark,
+    onSurface = White,
+    surfaceVariant = ClayDark,
+    onSurfaceVariant = ClayLight,
+    outline = ClayDark,
+    error = Color(0xFFB0B0B0),
+    onError = NearBlack,
+    errorContainer = ClayDark,
+    onErrorContainer = White
 )
 
 private val LightColors = lightColorScheme(
-    primary = GreenCorrect,
-    onPrimary = Color.White,
-    secondary = RedForgot,
-    onSecondary = Color.White,
-    background = DeckBackgroundLight,
-    surface = Color.White,
-    onBackground = Color(0xFF1D1B33),
-    onSurface = Color(0xFF1D1B33)
+    primary = NearBlack,
+    onPrimary = White,
+    primaryContainer = ClayLight,
+    onPrimaryContainer = NearBlack,
+    secondary = ClayDark,
+    onSecondary = White,
+    secondaryContainer = ClayLight,
+    onSecondaryContainer = NearBlack,
+    tertiary = Clay,
+    onTertiary = NearBlack,
+    background = ClaySurfaceLight,
+    onBackground = NearBlack,
+    surface = White,
+    onSurface = NearBlack,
+    surfaceVariant = ClayLight,
+    onSurfaceVariant = NearBlack,
+    outline = Clay,
+    error = Color(0xFF5C5C5C),
+    onError = White,
+    errorContainer = ClayLight,
+    onErrorContainer = NearBlack
+)
+
+private val AppShapes = Shapes(
+    extraSmall = TextFieldCornerShape,
+    small = TextFieldCornerShape,
+    medium = PillCornerShape,
+    large = LargeCardCornerShape,
+    extraLarge = LargeCardCornerShape
 )
 
 @Composable
@@ -40,7 +75,7 @@ fun DeckSwipeTheme(
     }
     MaterialTheme(
         colorScheme = scheme,
+        shapes = AppShapes,
         content = content
     )
 }
-

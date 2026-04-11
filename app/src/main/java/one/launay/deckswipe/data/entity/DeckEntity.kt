@@ -16,6 +16,11 @@ data class DeckEntity(
     @ColumnInfo(name = "created_at")
     val createdAtMillis: Long,
     @ColumnInfo(name = "updated_at")
-    val updatedAtMillis: Long
+    val updatedAtMillis: Long,
+    @ColumnInfo(name = "is_favorite")
+    val isFavorite: Boolean = false,
+    @ColumnInfo(name = "description")
+    val description: String = "",
+    @ColumnInfo(name = "cover_uri")
+    val coverUri: String? = null
 )
-

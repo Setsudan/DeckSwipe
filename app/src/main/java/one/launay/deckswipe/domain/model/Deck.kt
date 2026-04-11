@@ -5,6 +5,8 @@ data class Deck(
     val name: String,
     val topicTags: List<String>,
     val createdAtMillis: Long,
-    val updatedAtMillis: Long
+    val updatedAtMillis: Long,
+    val isFavorite: Boolean = false,
+    val description: String = "",
+    val coverUri: String? = null
 )
-
