@@ -51,5 +51,9 @@ class FakeDeckRepository(
 
     override suspend fun deleteCard(cardId: Long) = Unit
 
-    override suspend fun deleteDeck(deckId: Long) = Unit
+    override suspend fun deleteDeck(deckId: Long) {
+        decks = decks.filter { it.id != deckId }
+        dueByDeckId = dueByDeckId - deckId
+        cardsByDeckId = cardsByDeckId - deckId
+    }
 }

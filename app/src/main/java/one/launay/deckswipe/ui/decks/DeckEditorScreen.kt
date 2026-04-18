@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Button
@@ -205,32 +204,36 @@ fun DeckEditorScreen(
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
 
-                    Row(
+                    Column(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         OutlinedButton(
                             onClick = { vm.addCard() },
                             enabled = !state.isSaving,
+                            modifier = Modifier.fillMaxWidth(),
                             shape = MaterialTheme.shapes.medium
                         ) {
                             Text(text = strings.deckEditorAddCard)
                         }
-                        Row {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
                             OutlinedButton(
                                 onClick = onCancel,
                                 enabled = !state.isSaving,
+                                modifier = Modifier.weight(1f),
                                 shape = MaterialTheme.shapes.medium
                             ) {
                                 Text(text = strings.deckEditorCancel)
                             }
-                            Spacer(modifier = Modifier.width(8.dp))
                             Button(
                                 onClick = { vm.save() },
                                 enabled = !state.isSaving,
+                                modifier = Modifier.weight(1f),
                                 shape = MaterialTheme.shapes.medium
                             ) {
                                 Text(text = strings.deckEditorSave)

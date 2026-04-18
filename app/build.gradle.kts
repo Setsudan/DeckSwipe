@@ -66,10 +66,12 @@ dependencies {
     implementation(libs.lifecycle.viewmodel.compose)
 
     implementation(libs.coil.compose)
+    implementation(libs.android.image.cropper.canhub)
     implementation("androidx.compose.material:material-icons-extended")
 
     implementation(libs.coroutines.core)
     implementation(libs.serialization.json)
+    implementation("com.tom-roush:pdfbox-android:2.0.27.0")
 
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)

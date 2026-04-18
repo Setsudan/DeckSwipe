@@ -29,7 +29,10 @@ class ImportViewModelTest {
         val vm = ImportViewModel(
             ClipboardImporter(json) { fixedNow },
             FakeDeckRepository(),
-            ClipboardAccessor { ClipboardReadOutcome.EmptyClipboard }
+            object : ClipboardAccessor {
+                override fun read() = ClipboardReadOutcome.EmptyClipboard
+                override fun writePlainText(label: String, text: String) = Unit
+            }
         )
         vm.importFromClipboard()
         advanceUntilIdle()
@@ -42,7 +45,10 @@ class ImportViewModelTest {
         val vm = ImportViewModel(
             ClipboardImporter(json) { fixedNow },
             FakeDeckRepository(),
-            ClipboardAccessor { ClipboardReadOutcome.Ok("{ not json") }
+            object : ClipboardAccessor {
+                override fun read() = ClipboardReadOutcome.Ok("{ not json")
+                override fun writePlainText(label: String, text: String) = Unit
+            }
         )
         vm.importFromClipboard()
         advanceUntilIdle()
@@ -65,7 +71,10 @@ class ImportViewModelTest {
         val vm = ImportViewModel(
             ClipboardImporter(json) { fixedNow },
             repo,
-            ClipboardAccessor { ClipboardReadOutcome.Ok(raw) }
+            object : ClipboardAccessor {
+                override fun read() = ClipboardReadOutcome.Ok(raw)
+                override fun writePlainText(label: String, text: String) = Unit
+            }
         )
         vm.importFromClipboard()
         advanceUntilIdle()

@@ -2,18 +2,14 @@ package one.launay.deckswipe.ui.navigation
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import androidx.compose.material3.Text
-import one.launay.deckswipe.ui.LocalStrings
 import one.launay.deckswipe.ui.decks.DeckDetailsScreen
 import one.launay.deckswipe.ui.decks.DeckListScreen
 import one.launay.deckswipe.ui.decks.DeckEditorScreen
@@ -50,9 +46,12 @@ fun DeckSwipeNavHost(
         composable(Routes.HOME) {
             Box(Modifier.padding(contentPadding)) {
                 HomeDashboardScreen(
-                    onBrowseDecks = { navController.navigate(Routes.DECK_LIST) },
+                    onBrowseDecks = { navController.navigate(Routes.CARDS) },
                     onOpenDeckDetails = { deckId ->
                         navController.navigate("deck/$deckId")
+                    },
+                    onEditDeck = { deckId ->
+                        navController.navigate("edit_deck/$deckId")
                     }
                 )
             }
@@ -72,6 +71,12 @@ fun DeckSwipeNavHost(
                     onImportClick = { navController.navigate(Routes.IMPORT) },
                     onOpenDeck = { deckId ->
                         navController.navigate("deck/$deckId")
+                    },
+                    onStudyDeck = { deckId ->
+                        navController.navigate("study/$deckId")
+                    },
+                    onEditDeck = { deckId ->
+                        navController.navigate("edit_deck/$deckId")
                     }
                 )
             }
@@ -149,12 +154,20 @@ fun DeckSwipeNavHost(
             )
         }
         composable(Routes.CARDS) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(contentPadding)
-            ) {
-                PlaceholderScreen()
+            Box(Modifier.padding(contentPadding)) {
+                DeckListScreen(
+                    onNewDeck = { navController.navigate(Routes.NEW_DECK) },
+                    onImportClick = { navController.navigate(Routes.IMPORT) },
+                    onOpenDeck = { deckId ->
+                        navController.navigate("deck/$deckId")
+                    },
+                    onStudyDeck = { deckId ->
+                        navController.navigate("study/$deckId")
+                    },
+                    onEditDeck = { deckId ->
+                        navController.navigate("edit_deck/$deckId")
+                    }
+                )
             }
         }
         composable(Routes.SETTINGS) {
@@ -166,13 +179,3 @@ fun DeckSwipeNavHost(
     }
 }
 
-@Composable
-private fun PlaceholderScreen() {
-    val strings = LocalStrings.current
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(text = strings.placeholderAllCards)
-    }
-}

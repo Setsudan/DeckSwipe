@@ -17,6 +17,7 @@ coroutines = "1.9.0"
 serializationJson = "1.7.3"
 coroutinesTest = "1.9.0"
 coil = "2.6.0"
+imageCropperCanHub = "4.5.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -41,6 +42,7 @@ serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serializ
 coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutinesTest" }
 room-testing = { group = "androidx.room", name = "room-testing", version.ref = "room" }
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
+android-image-cropper-canhub = { group = "com.github.CanHub", name = "Android-Image-Cropper", version.ref = "imageCropperCanHub" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

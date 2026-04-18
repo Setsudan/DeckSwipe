@@ -22,6 +22,7 @@ class DeckSwipeApplication : Application() {
         super.onCreate()
         database = DeckSwipeDatabase.getInstance(this)
         deckRepository = DeckRepositoryImpl(
+            appContext = this,
             dao = database.deckSwipeDao(),
             clock = { System.currentTimeMillis() }
         )

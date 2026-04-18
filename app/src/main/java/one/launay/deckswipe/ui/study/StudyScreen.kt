@@ -160,7 +160,8 @@ fun StudyScreen(
                         onSwipedRight = {
                             showBack = false
                             vm.onKnewIt()
-                        }
+                        },
+                        onCardTap = { showBack = !showBack }
                     ) {
                         Column(
                             modifier = Modifier
@@ -186,7 +187,7 @@ fun StudyScreen(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                Button(
+                                TextButton(
                                     onClick = { showBack = !showBack },
                                     shape = MaterialTheme.shapes.medium
                                 ) {

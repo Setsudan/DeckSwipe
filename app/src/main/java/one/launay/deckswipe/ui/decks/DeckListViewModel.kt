@@ -39,20 +39,7 @@ class DeckListViewModel(
                 val decks = repository.getDecks()
                 val now = System.currentTimeMillis()
                 val rows = decks.map { deck ->
-                    val total = repository.getCardCountForDeck(deck.id)
-                    val due = repository.getDueCardsForDeck(deck.id, now).size
-                    val mastered = (total - due).coerceAtLeast(0)
-                    val mastery = if (total == 0) {
-                        0f
-                    } else {
-                        mastered.toFloat() / total.toFloat()
-                    }
-                    DeckListRow(
-                        deck = deck,
-                        totalCards = total,
-                        dueNowCount = due,
-                        masteryProgress = mastery
-                    )
+                    deckRowForStats(repository, deck, now)
                 }
                 _state.value = DeckListUiState.Loaded(rows)
             } catch (_: Throwable) {
@@ -76,6 +63,20 @@ class DeckListViewModel(
                     }
                 }
             )
+        }
+    }
+
+    fun deleteDeck(deckId: Long) {
+        val loaded = _state.value as? DeckListUiState.Loaded ?: return
+        viewModelScope.launch {
+            try {
+                repository.deleteDeck(deckId)
+                _state.value = DeckListUiState.Loaded(
+                    loaded.rows.filter { it.deck.id != deckId }
+                )
+            } catch (_: Throwable) {
+                _state.value = DeckListUiState.Error
+            }
         }
     }
 }

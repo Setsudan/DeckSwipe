@@ -3,6 +3,7 @@ package one.launay.deckswipe.ui.decks
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,22 +11,20 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -37,16 +36,21 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.ui.unit.dp
@@ -55,6 +59,14 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.canhub.cropper.CropImageContract
+import com.canhub.cropper.CropImageContractOptions
+import com.canhub.cropper.CropImageOptions
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import one.launay.deckswipe.data.covers.deleteOwnedCoverFile
+import one.launay.deckswipe.data.covers.persistCoverFromUri
 import one.launay.deckswipe.ui.LocalDeckRepository
 import one.launay.deckswipe.ui.LocalStrings
 import one.launay.deckswipe.ui.theme.PillCornerShape
@@ -70,6 +82,10 @@ fun DeckDetailsScreen(
 ) {
     val repository = LocalDeckRepository.current
     val strings = LocalStrings.current
+    val context = LocalContext.current
+    val configuration = LocalConfiguration.current
+    val scope = rememberCoroutineScope()
+
     val vm: DeckDetailsViewModel = viewModel(
         key = "deck_details_$deckId",
         factory = viewModelFactory {
@@ -91,14 +107,40 @@ fun DeckDetailsScreen(
     var tagsDialog by remember { mutableStateOf(false) }
     var tagsDraft by remember { mutableStateOf("") }
 
+    val cropLauncher = rememberLauncherForActivityResult(CropImageContract()) { result ->
+        if (result.isSuccessful) {
+            val uri = result.uriContent ?: return@rememberLauncherForActivityResult
+            scope.launch(Dispatchers.IO) {
+                try {
+                    deleteOwnedCoverFile(context, vm.state.value.deck?.coverUri)
+                    val persisted = persistCoverFromUri(context, uri, deckId)
+                    withContext(Dispatchers.Main) {
+                        vm.updateCoverUri(persisted.toString())
+                    }
+                } catch (_: Throwable) {
+                }
+            }
+        }
+    }
+
     val coverPicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
-    ) { uri ->
-        uri?.let { vm.updateCoverUri(it.toString()) }
+    ) { picked ->
+        picked?.let { pickedUri ->
+            cropLauncher.launch(
+                CropImageContractOptions(
+                    uri = pickedUri,
+                    cropImageOptions = CropImageOptions(
+                        fixAspectRatio = true,
+                        aspectRatioX = 235,
+                        aspectRatioY = 100
+                    )
+                )
+            )
+        }
     }
 
     val deck = state.deck
-    val title = deck?.name?.ifBlank { strings.studyUntitledDeck } ?: ""
 
     if (titleDialog && deck != null) {
         AlertDialog(
@@ -193,13 +235,18 @@ fun DeckDetailsScreen(
         )
     }
 
+    val heroHeight = (configuration.screenHeightDp.toFloat() * 0.25f).dp
+
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text(text = title) },
+            TopAppBar(
+                title = { },
                 navigationIcon = {
-                    TextButton(onClick = onBack) {
-                        Text(text = strings.studyDoneBack)
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = strings.deckDetailsBackA11y
+                        )
                     }
                 },
                 actions = {
@@ -232,6 +279,7 @@ fun DeckDetailsScreen(
                     )
                 }
                 else -> {
+                    val titleText = deck.name.ifBlank { strings.studyUntitledDeck }
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
@@ -239,14 +287,13 @@ fun DeckDetailsScreen(
                             .padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        val context = LocalContext.current
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .aspectRatio(16f / 9f)
-                                .clip(RoundedCornerShape(16.dp))
-                        ) {
-                            if (deck.coverUri != null) {
+                        if (!deck.coverUri.isNullOrBlank()) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(heroHeight)
+                                    .clip(RoundedCornerShape(16.dp))
+                            ) {
                                 AsyncImage(
                                     model = ImageRequest.Builder(context)
                                         .data(Uri.parse(deck.coverUri))
@@ -256,13 +303,68 @@ fun DeckDetailsScreen(
                                     modifier = Modifier.fillMaxSize(),
                                     contentScale = ContentScale.Crop
                                 )
-                            } else {
-                                Surface(
-                                    modifier = Modifier.fillMaxSize(),
-                                    color = MaterialTheme.colorScheme.surfaceVariant
-                                ) {}
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(
+                                            brush = Brush.verticalGradient(
+                                                colors = listOf(
+                                                    Color.Black.copy(alpha = 0.1f),
+                                                    Color.Black.copy(alpha = 0.62f)
+                                                )
+                                            )
+                                        )
+                                )
+                                Row(
+                                    modifier = Modifier
+                                        .align(Alignment.BottomStart)
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Text(
+                                        text = titleText,
+                                        style = MaterialTheme.typography.headlineSmall,
+                                        color = Color.White,
+                                        modifier = Modifier.weight(1f),
+                                        maxLines = 2
+                                    )
+                                    TextButton(
+                                        onClick = {
+                                            titleDraft = deck.name
+                                            titleDialog = true
+                                        }
+                                    ) {
+                                        Text(
+                                            text = strings.deckDetailsEditTitle,
+                                            color = Color.White
+                                        )
+                                    }
+                                }
+                            }
+                        } else {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(
+                                    text = titleText,
+                                    style = MaterialTheme.typography.headlineSmall,
+                                    modifier = Modifier.weight(1f)
+                                )
+                                TextButton(
+                                    onClick = {
+                                        titleDraft = deck.name
+                                        titleDialog = true
+                                    }
+                                ) {
+                                    Text(text = strings.deckDetailsEditTitle)
+                                }
                             }
                         }
+
                         Row(
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
@@ -273,31 +375,14 @@ fun DeckDetailsScreen(
                                 Text(text = strings.deckDetailsChangeCover)
                             }
                             OutlinedButton(
-                                onClick = { vm.updateCoverUri(null) },
+                                onClick = {
+                                    deleteOwnedCoverFile(context, deck.coverUri)
+                                    vm.updateCoverUri(null)
+                                },
                                 enabled = deck.coverUri != null,
                                 shape = MaterialTheme.shapes.medium
                             ) {
                                 Text(text = strings.deckDetailsRemoveCover)
-                            }
-                        }
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = deck.name.ifBlank { strings.studyUntitledDeck },
-                                style = MaterialTheme.typography.headlineSmall,
-                                modifier = Modifier.weight(1f)
-                            )
-                            TextButton(
-                                onClick = {
-                                    titleDraft = deck.name
-                                    titleDialog = true
-                                }
-                            ) {
-                                Text(text = strings.deckDetailsEditTitle)
                             }
                         }
 
@@ -385,7 +470,7 @@ fun DeckDetailsScreen(
                                     strokeWidth = 6.dp
                                 )
                                 Text(
-                                    text = state.totalCards.toString(),
+                                    text = state.dueNowCount.toString(),
                                     style = MaterialTheme.typography.titleMedium
                                 )
                             }

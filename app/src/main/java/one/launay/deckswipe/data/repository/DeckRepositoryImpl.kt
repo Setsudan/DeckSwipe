@@ -1,7 +1,9 @@
 package one.launay.deckswipe.data.repository
 
+import android.content.Context
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import one.launay.deckswipe.data.covers.deleteOwnedCoverFile
 import one.launay.deckswipe.data.db.DeckSwipeDao
 import one.launay.deckswipe.data.entity.CardEntity
 import one.launay.deckswipe.data.entity.DeckEntity
@@ -10,6 +12,7 @@ import one.launay.deckswipe.domain.model.Deck
 import one.launay.deckswipe.domain.repository.DeckRepository
 
 class DeckRepositoryImpl(
+    private val appContext: Context,
     private val dao: DeckSwipeDao,
     private val clock: () -> Long
 ) : DeckRepository {
@@ -60,6 +63,8 @@ class DeckRepositoryImpl(
     }
 
     override suspend fun deleteDeck(deckId: Long) = withContext(Dispatchers.IO) {
+        val deck = dao.getDeckById(deckId)?.toDomain()
+        deleteOwnedCoverFile(appContext, deck?.coverUri)
         dao.deleteDeckById(deckId)
     }
 

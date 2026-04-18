@@ -21,8 +21,8 @@ Studying is a chore. Traditional flashcard apps (like Anki) are incredibly power
 Harness the power of Large Language Models (LLMs) to generate study decks from your PDFs and course notes—**without the app ever connecting to the internet.**
 
 Instead of managing API keys or sending your personal files to a server, DeckSwipe uses a secure **Clipboard Bridge**:
-1. Tap **"Generate AI Prompt"** in the app.
-2. Paste the prompt + your course document into your favorite AI (ChatGPT, Claude, local LLM).
+1. Tap **"Copy AI prompt to clipboard"** and attach your own notes, or tap **"Pick PDF or text notes for AI"** so the app copies the prompt plus locally extracted text (PDF or plain text) in one clip.
+2. Paste that clipboard content into your favorite AI (ChatGPT, Claude, local LLM).
 3. Copy the AI's response and tap **"Import from Clipboard"** in DeckSwipe.
 4. The app parses the strict JSON output and instantly builds your deck locally.
 
@@ -40,9 +40,9 @@ Built with **100% Kotlin** and **Jetpack Compose** using **Clean Architecture**.
 | **UI** | Material 3, Jetpack Compose Gestures (`pointerInput`, `Animatable`) |
 | **Domain** | MVVM, Coroutines, Flow |
 | **Data** | Room (Local Database), `kotlinx.serialization` (JSON Parsing) |
-| **System** | Android ClipboardManager API |
+| **System** | Android ClipboardManager API, Storage Access Framework, local PDF and plain-text extraction (`pdfbox-android`, no network) |
 
-**Requirements:** Android 15+ (API 36).
+**Requirements:** Android 15 (API 35) or newer; project targets API 36.
 
 ## Privacy & Manifesto
 
@@ -74,12 +74,13 @@ For developers or power users, DeckSwipe expects the following JSON structure wh
 
 The current prototype includes:
 
-* Jetpack Compose swipeable card stack for studying decks.
+* Jetpack Compose swipeable card stack for studying decks, with tap-to-flip on the card (plus a flip control for accessibility).
 * Room database schema for decks and cards, with a simple spaced repetition model.
 * Clipboard-based JSON import matching the schema described above.
+* BYOAI helpers: copy the schema prompt only, or pick a PDF / text file to copy prompt plus extracted source text for pasting into an external LLM (still fully offline).
 * Dark and light themes using Material 3.
 
-To run the app, open this project in Android Studio (Giraffe or newer) and run the `app` configuration on an emulator or device running Android 15 (API 36) or newer.
+To run the app, open this project in Android Studio (Giraffe or newer) and run the `app` configuration on an emulator or device running Android 15 (API 35) or newer.
 
 To run unit tests:
 
@@ -89,5 +90,5 @@ To run unit tests:
 
 ## License
 
-**GPLv3** - See [LICENSE](https://www.google.com/search?q=LICENSE).
+**GPLv3** - See [LICENSE](LICENSE).
 Free to use, study, and modify.
